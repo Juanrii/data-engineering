@@ -1,0 +1,69 @@
+Big Data
+
+El Big Data cumple con 3 requerimientos, conocidas como las 3Vs:
+    # Volumen
+    # Velocidad
+    # Variedad
+
+Volumen: La Big Data se compone por grandes cantidades de información almacenada en distintos repositorios. 
+Para el 2020 estamos hablando de cerca de 40 zettabytes que representa un incremento de aproximadamente 300 
+veces respecto a 2005. Muchas compañías cuentan con Terabytes o incluso Petabytes de información en servidores.
+
+Velocidad: La información llega continuamente. La gran velocidad con la que llega y se adquiere 
+información permite entender cada vez más a los datos.
+Por ejemplo la cantidad de informacion que llega a mercado pago por cada transferencias.
+
+Variedad: La forma en la que se presentan los datos puede ser muy diferente. 
+La Big Data contiene la información que utilizan compañías de todo tipo y puede tener múltiples 
+fuentes y distintas formas como:
+    - Estructurada
+    - Semiestructurada
+    - No estructurada
+
+
+Tambien se agregan dos mas convirtiendose en las 5Vs:
+
+Veracidad: Informacion de calidad y que representa al fenomeno de estudio.
+
+Valor: Importancia que generan los datos para la toma de decisiones, generar cambios
+y adaptarse al entorno.
+
+
+Roles
+
+Data Analyst: Utilizan datos para generar reportes y análisis asociados a datos. 
+A diferencia de los Data Scientists y Data Engineers usualmente interactúan con 
+datos sencillos de manipular que se han limpiado y transformado previamente. 
+Sus análisis son de tipo descriptivo, diagnóstico, predictivo y prescriptivo. 
+Pueden ser responsables de mantener dashboards, generar reportes y preparar 
+visualizaciones de datos que ayudan a la toma de decisiones.
+
+Data Scientist: Juegan un rol fundamental en el equipo de analítica. 
+Estas personas necesitan de tener habilidades en matemática, estadística, 
+programación y uso de herramientas (modelamiento estadístico, Machine Learning, 
+Deep Learning e Inteligencia Artificial) para poder generar insights 
+(conclusiones relevantes) sobre los datos.
+
+Data Engineer: Tienen el papel de diseñar, crear y mantener datos que se necesiten 
+usar para proyectos asociados a data. Ellos trabajan de la mano con los data scientists 
+y los data analysts. La mayoría del trabajo asociado a los Data Engineers se 
+relaciona con la preparación de la infraestructura, recopilación e integración 
+de datos de diversas fuentes que permite el funcionamiento del equipo de data.
+
+
+OLTP y OLAP
+
+OLTP (Online Transaction Processing):
+    Pensemos en que es un sistema que esta preparado y es habil para recibir muchas 
+    inserciones de datos continueamente, para borrar y actualizar datos
+    rapidamente. Estan preparados para ser fuertes en estos tipos de operaciones.
+    Utilizan un sistema Normalizado, mas tablas y menos columnas.
+    Por ejemplo una base de ventas de Carrefour. Continuamente esta
+    procesando informacion compras.
+    Pero no esta preparada para ver las compras que se producieron en los utlimos
+    5 años los dias Jueves con la tarjeta X. OLTP no es tan fuerte para realizar
+    estas consultas complejas.
+
+OLAP (Online Analytical Processing):
+    Preparado para hacer analisis, para hacer consultas grandes y complejas,
+    de forma eficaz y eficiente. Sistemas desnormalizado.
