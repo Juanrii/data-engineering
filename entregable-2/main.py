@@ -16,12 +16,19 @@ def update_data(cursor, nombre_tabla, row, ciudad, fecha):
     ))
 
 # Insertar nuevos registros
-def insert_data(cursor, nombre_tabla, df):
-    insert_query = f"INSERT INTO {nombre_tabla} (ciudad, pais, region, latitud, longitud, zona_horaria, hora_local, temperatura, codigo_clima, iconos_clima, descripciones_clima, velocidad_viento, grado_viento, direccion_viento, presion, precipitacion, humedad, cobertura_nubes, sensacion_termica, indice_uv, visibilidad, fecha) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    # Lista de valores a insertar
-    data_values = [tuple(row) for row in df.values]
-    # Insertar multiples registros
-    cursor.executemany(insert_query, data_values)
+def insert_data(cursor, nombre_tabla_redshift, data):
+    insert_query = f"INSERT INTO {nombre_tabla_redshift} (ciudad, pais, region, latitud, longitud, zona_horaria, hora_local, temperatura, codigo_clima, iconos_clima, descripciones_clima, velocidad_viento, grado_viento, direccion_viento, presion, precipitacion, humedad, cobertura_nubes, sensacion_termica, indice_uv, visibilidad, fecha) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    # Insertar multiples registros masivos
+    cursor.executemany(insert_query, data)
+
+# Acumular data a registrar
+def prepare_data(df):
+    data = []
+    for index, row in df.iterrows():
+        # Añadir cada fila a la lista de datos a insertar
+        data.append(tuple(row))
+    # Retornar todas las filas acumuladas en un solo query masivo
+    return data
 
 
 # Definir la funcion principal main
@@ -55,19 +62,27 @@ def main():
         'Rosario'
     ]
     
+    data_to_insert = []
+
+    # Verifica si se ha realizado alguna actualizacion
+    updated = False
+
     # Tuve que realizar este bucle porque no hay otra forma de consultar
     # multiples ciudades al menos que se pague la subscripcion.
     # Por lo tanto cada iteracion costara 1 request
     for city in CITIES:
 
         # Obtener los datos para luego insertarlos en Redshift
-        data_to_insert = weather_api.get_data(city)
+        raw_data = weather_api.get_data(city)
 
         # Guardar los datos en caso de obtener los valores deseados
-        if data_to_insert:
+        if raw_data:
 
             # Creacion del DataFrame utilizando pandas
-            df = pd.DataFrame(data_to_insert)
+            df = pd.DataFrame(raw_data)
+
+            # Eliminar duplicados basados las columnas ciudad y fecha
+            df = df.drop_duplicates(subset=['ciudad', 'fecha'])
 
             # Tabla deseada
             nombre_tabla_redshift = 'clima_ciudades'
@@ -88,13 +103,21 @@ def main():
                 # Si ya existe la combinacion ciudad-fecha, actualiza los campos
                 if result:
                     update_data(cursor, nombre_tabla_redshift, row, ciudad, fecha)
+                    updated = True
                 # De lo contrario, inserta un nuevo registro
                 else:
-                    insert_data(cursor, nombre_tabla_redshift, df)
-            
-            conn.commit()
-            # Muestra por consola los datos ingresados en formato json
-            print(data_to_insert)
+                    data_to_insert.append(prepare_data(df))
+    
+    # Si se realizo alguna actualizacion, hacer el commit
+    if updated:
+        conn.commit()
+
+    # Realizar una comprension de la lista data para obtener todas las filas como elementos individuales
+    data = [row for sublist in data_to_insert for row in sublist]
+    if data:
+        # Insertar multiples registros masivamente
+        insert_data(cursor, nombre_tabla_redshift, data)
+        conn.commit()
 
 if __name__ == "__main__":
     main()
